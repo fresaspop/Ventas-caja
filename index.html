@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fresas Pop — Ventas y Caja</title>
+<style>
+  :root{
+    --accent:#db5275;
+    --accent-deep:#56091f;
+    --rojo:#b62d11;
+    --cream:#fff3f4;
+    --bg:#fff8f6;
+    --surface:#ffffff;
+    --border:#f0d6dc;
+    --text:#34121b;
+    --text-muted:#8a6570;
+    --good:#3f7d5a;
+    --good-bg:#e9f3ec;
+    --warn:#b62d11;
+    --warn-bg:#fbe9e5;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:70px;
+  }
+  h1,h2,h3{margin:0 0 8px;color:var(--accent-deep);}
+  h1{font-size:1.3rem;}
+  h2{font-size:1.1rem;}
+  h3{font-size:1rem;}
+  p{margin:0 0 8px;}
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:0.95rem;
+    font-weight:600;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:active{background:var(--accent-deep);}
+  .btn-secondary{background:var(--surface);color:var(--accent-deep);border:1.5px solid var(--accent);}
+  .btn-secondary.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn-danger{background:var(--warn-bg);color:var(--warn);}
+  .btn-ghost{background:transparent;color:var(--text-muted);padding:8px 10px;}
+  .btn-block{width:100%;}
+  input, select{
+    font-family:inherit;
+    font-size:1rem;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:#fff;
+    color:var(--text);
+    width:100%;
+  }
+  label{display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:4px;font-weight:600;}
+  .field{margin-bottom:14px;}
+  .hidden{display:none !important;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:12px;
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row > *{flex:1;}
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+    padding:3px 9px;border-radius:999px;
+  }
+  .pill.good{background:var(--good-bg);color:var(--good);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.muted{background:var(--cream);color:var(--text-muted);}
+
+  /* header / nav */
+  header.topbar{
+    background:var(--accent-deep);
+    color:#fff;
+    padding:14px 16px;
+    display:flex;justify-content:space-between;align-items:center;
+    position:sticky;top:0;z-index:10;
+  }
+  header.topbar .brand{font-weight:800;font-size:1.05rem;letter-spacing:.02em;}
+  header.topbar .who{font-size:0.8rem;opacity:0.85;text-align:right;}
+  header.topbar .who button{margin-top:4px;}
+  nav.tabs{
+    position:fixed;bottom:0;left:0;right:0;
+    display:flex;background:var(--surface);
+    border-top:1px solid var(--border);
+    z-index:10;
+  }
+  nav.tabs button{
+    flex:1;background:none;border-radius:0;color:var(--text-muted);
+    font-size:0.72rem;font-weight:700;padding:10px 4px;
+  }
+  nav.tabs button.active{color:var(--accent);}
+
+  main{max-width:520px;margin:0 auto;padding:16px;}
+
+  /* login pin pad */
+  .pin-wrap{display:flex;flex-direction:column;align-items:center;padding-top:14vh;}
+  .pin-dots{display:flex;gap:14px;margin:22px 0;}
+  .pin-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);}
+  .pin-dots span.filled{background:var(--accent);}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,64px);gap:14px;}
+  .pin-pad button{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--surface);border:1.5px solid var(--border);
+    font-size:1.3rem;color:var(--accent-deep);font-weight:700;
+  }
+  .pin-pad button:active{background:var(--cream);}
+  .pin-error{color:var(--warn);font-size:0.85rem;min-height:20px;margin-top:8px;}
+
+  /* catalog list */
+  .catalog-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .catalog-item:last-child{border-bottom:none;}
+  .catalog-item .info{flex:1;}
+  .catalog-item .info small{color:var(--text-muted);display:block;}
+  .catalog-item .actions{display:flex;gap:6px;}
+  .catalog-item .actions button{padding:8px 10px;font-size:0.78rem;}
+
+  .grid-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .pick-btn{
+    background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+    padding:10px;text-align:left;font-weight:600;font-size:0.88rem;color:var(--text);
+  }
+  .pick-btn small{display:block;color:var(--text-muted);font-weight:500;margin-top:2px;}
+  .pick-btn.selected{border-color:var(--accent);background:var(--cream);color:var(--accent-deep);}
+
+  .ticket-line{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border);}
+  .ticket-line:last-child{border-bottom:none;}
+  .ticket-total{display:flex;justify-content:space-between;font-weight:800;font-size:1.05rem;padding-top:8px;color:var(--accent-deep);}
+
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);}
+  th{font-size:0.72rem;text-transform:uppercase;color:var(--text-muted);}
+  .table-wrap{overflow-x:auto;}
+
+  .toast{
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:var(--accent-deep);color:#fff;padding:10px 18px;border-radius:999px;
+    font-size:0.85rem;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  }
+  .setup-box{max-width:420px;margin:10vh auto;padding:20px;}
+  .muted{color:var(--text-muted);font-size:0.88rem;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🍓 Fresas Pop</div>
+  <div class="who hidden" id="whoBox">
+    <div id="whoName"></div>
+    <button class="btn-ghost" id="btnLogout" style="color:#ffd9e2;padding:2px 0;">Cambiar usuario</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ========================= CONFIG SCREEN (shown if firebaseConfig is not filled in) ========================= -->
+  <section id="screen-needconfig" class="hidden">
+    <div class="card">
+      <h1>Falta conectar Firebase</h1>
+      <p>Abre este archivo con un editor de texto, busca la sección <code>CONFIG</code> cerca del final, y pega ahí los datos de tu proyecto <strong>adminfresaspop</strong> (Firebase console → ⚙️ Configuración del proyecto → Tus apps → configuración del SDK).</p>
+      <p class="muted">También activa, dentro de Firebase console: Authentication → Sign-in method → habilita "Correo electrónico/contraseña"; y crea una base de datos Firestore si no la has creado (modo producción).</p>
+    </div>
+  </section>
+
+  <!-- ========================= FIRST-TIME SETUP: create staff ========================= -->
+  <section id="screen-setup" class="hidden">
+    <div class="setup-box">
+      <h1>Configura tu equipo</h1>
+      <p class="muted">Todavía no hay nadie registrado. Crea un acceso con nombre y PIN de 4 dígitos para cada persona (puedes agregar más luego desde Catálogo → Equipo).</p>
+      <div class="card">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" id="setupName" placeholder="Ej. Darianny">
+        </div>
+        <div class="field">
+          <label>PIN de 4 dígitos</label>
+          <input type="text" id="setupPin" inputmode="numeric" maxlength="4" placeholder="1234">
+        </div>
+        <button class="btn-primary btn-block" id="btnSetupCreate">Crear acceso</button>
+      </div>
+      <button class="btn-secondary btn-block" id="btnSetupDone">Ya agregué a todos, continuar</button>
+    </div>
+  </section>
+
+  <!-- ========================= LOGIN (PIN) ========================= -->
+  <section id="screen-login" class="hidden">
+    <div class="pin-wrap">
+      <h1>¿Quién eres?</h1>
+      <p class="muted" id="loginHint">Escribe tu PIN de 4 dígitos</p>
+      <div class="pin-dots" id="pinDots">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+      <div class="pin-pad" id="pinPad">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="borrar">⌫</button><button data-k="0">0</button><button data-k="ok">✓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= VENDER ========================= -->
+  <section id="screen-vender" class="hidden">
+    <div id="ventaCajaGate" class="card hidden">
+      <h2>Primero abre la caja</h2>
+      <p class="muted">No puedes registrar ventas sin una caja abierta hoy.</p>
+      <div class="field">
+        <label>Efectivo inicial (RD$)</label>
+        <input type="number" id="gateOpeningAmount" inputmode="decimal" placeholder="0">
+      </div>
+      <button class="btn-primary btn-block" id="btnGateOpen">Abrir caja y empezar a vender</button>
+    </div>
+
+    <div id="ventaContent" class="hidden">
+      <div class="row" style="margin-bottom:12px;">
+        <button class="btn-secondary" id="tabModoMenu">Del menú</button>
+        <button class="btn-secondary" id="tabModoPersonalizada">Personalizada</button>
+      </div>
+
+      <!-- DEL MENU -->
+      <div id="modoMenu">
+        <div class="card">
+          <h2>Elige un producto</h2>
+          <div class="grid-pick" id="menuProductGrid"></div>
+        </div>
+        <div class="card hidden" id="menuSizeCard">
+          <h3>Tamaño</h3>
+          <div class="grid-pick" id="menuSizeGrid"></div>
+        </div>
+      </div>
+
+      <!-- PERSONALIZADA -->
+      <div id="modoPersonalizada" class="hidden">
+        <div class="card">
+          <h3>1. Tamaño</h3>
+          <div class="grid-pick" id="pTamano"></div>
+        </div>
+        <div class="card">
+          <h3>2. Base</h3>
+          <div class="grid-pick" id="pBase"></div>
+        </div>
+        <div class="card">
+          <h3>3. Crema</h3>
+          <div class="grid-pick" id="pCrema"></div>
+        </div>
+        <div class="card">
+          <h3>4. Fruta</h3>
+          <div class="grid-pick" id="pFruta"></div>
+        </div>
+        <div class="card">
+          <h3>5. Topping (elige 1, gratis)</h3>
+          <div class="grid-pick" id="pTopping"></div>
+        </div>
+        <div class="card">
+          <h3>Toppings premium (opcional, con costo)</h3>
+          <div class="grid-pick" id="pToppingPremium"></div>
+        </div>
+        <div class="card">
+          <h3>Extras 2oz (opcional, con costo)</h3>
+          <div class="grid-pick" id="pExtras"></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div><div class="muted">Subtotal calculado</div><h2 id="pCalc">RD$0</h2></div>
+          </div>
+          <div class="field">
+            <label>Precio final (puedes ajustarlo, ej. cortesías)</label>
+            <input type="number" id="pFinalPrice" inputmode="decimal">
+          </div>
+          <button class="btn-primary btn-block" id="btnAddPersonalizada">Agregar al ticket</button>
+        </div>
+      </div>
+
+      <!-- TICKET -->
+      <div class="card" id="ticketCard">
+        <h2>Ticket actual</h2>
+        <div id="ticketLines"><p class="muted">Aún no has agregado productos.</p></div>
+        <div class="ticket-total"><span>Total</span><span id="ticketTotal">RD$0</span></div>
+      </div>
+
+      <div class="card" id="checkoutCard" style="display:none;">
+        <h2>Cerrar venta</h2>
+        <div class="field">
+          <label>Método de pago</label>
+          <select id="cxPago">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label><input type="checkbox" id="cxDescuento" style="width:auto;"> Tuvo descuento</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="cxCredito" style="width:auto;"> Es a crédito</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Canal</label>
+          <select id="cxCanal">
+            <option value="local">Local</option>
+            <option value="web">Sitio web</option>
+            <option value="empresa">Puerta a puerta / empresa</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cliente (opcional)</label>
+          <input type="text" id="cxCliente" placeholder="Nombre">
+        </div>
+        <div class="field">
+          <label>Notas (opcional)</label>
+          <input type="text" id="cxNotas" placeholder="Ej. sin galleta, alergia a nuez...">
+        </div>
+        <button class="btn-primary btn-block" id="btnRegistrarVenta">Registrar venta</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= CATALOGO ========================= -->
+  <section id="screen-catalogo" class="hidden">
+    <div class="card">
+      <h1>Catálogo</h1>
+      <p class="muted">Todo aquí es editable: agrega, cambia precios o desactiva lo que ya no vendes.</p>
+      <div id="seedBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>Agregar artículo</h2>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="newType">
+          <option value="tamano">Tamaño (personalizada)</option>
+          <option value="base">Base (personalizada)</option>
+          <option value="crema">Crema (personalizada)</option>
+          <option value="fruta">Fruta (personalizada)</option>
+          <option value="topping">Topping gratis (personalizada)</option>
+          <option value="toppingPremium">Topping premium (personalizada)</option>
+          <option value="extra">Extra 2oz (personalizada)</option>
+          <option value="favorita">Favorita (combo fijo)</option>
+          <option value="premium">Premium (ej. Fresas Dubái)</option>
+          <option value="otro">Otro postre</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nombre</label>
+        <input type="text" id="newName" placeholder="Ej. Fresas Dubái">
+      </div>
+      <div class="field" id="newSimplePriceField">
+        <label>Precio / costo extra (RD$)</label>
+        <input type="number" id="newPrice" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="field hidden" id="newSizePricesField">
+        <label>Tamaños y precios (uno por línea: "9oz, 500")</label>
+        <input type="text" id="newSizePrices" placeholder="9oz, 500">
+      </div>
+      <button class="btn-primary btn-block" id="btnAddCatalog">Agregar</button>
+    </div>
+
+    <div class="card">
+      <h2>Tamaños (personalizada)</h2>
+      <div id="listTamano"></div>
+    </div>
+    <div class="card">
+      <h2>Bases</h2>
+      <div id="listBase"></div>
+    </div>
+    <div class="card">
+      <h2>Cremas</h2>
+      <div id="listCrema"></div>
+    </div>
+    <div class="card">
+      <h2>Frutas</h2>
+      <div id="listFruta"></div>
+    </div>
+    <div class="card">
+      <h2>Toppings gratis</h2>
+      <div id="listTopping"></div>
+    </div>
+    <div class="card">
+      <h2>Toppings premium</h2>
+      <div id="listToppingPremium"></div>
+    </div>
+    <div class="card">
+      <h2>Extras 2oz</h2>
+      <div id="listExtra"></div>
+    </div>
+    <div class="card">
+      <h2>Favoritas</h2>
+      <div id="listFavorita"></div>
+    </div>
+    <div class="card">
+      <h2>Premium</h2>
+      <div id="listPremium"></div>
+    </div>
+    <div class="card">
+      <h2>Otros postres</h2>
+      <div id="listOtro"></div>
+    </div>
+
+    <div class="card">
+      <h2>Equipo</h2>
+      <div id="listStaff"></div>
+      <div class="row" style="margin-top:10px;">
+        <input type="text" id="staffNewName" placeholder="Nombre">
+        <input type="text" id="staffNewPin" inputmode="numeric" maxlength="4" placeholder="PIN">
+      </div>
+      <button class="btn-secondary btn-block" id="btnStaffAdd" style="margin-top:8px;">Agregar persona</button>
+    </div>
+  </section>
+
+  <!-- ========================= CAJA ========================= -->
+  <section id="screen-caja" class="hidden">
+    <div class="card" id="cajaClosedCard">
+      <h1>Caja cerrada</h1>
+      <p class="muted">Abre la caja para empezar el día.</p>
+      <div class="field">
+        <label>Efectivo inicial (RD$)</label>
+        <input type="number" id="cajaOpeningAmount" inputmode="decimal" placeholder="0">
+      </div>
+      <button class="btn-primary btn-block" id="btnCajaOpen">Abrir caja</button>
+    </div>
+
+    <div class="card hidden" id="cajaOpenCard">
+      <h1>Caja abierta <span class="pill good">Activa</span></h1>
+      <p class="muted" id="cajaOpenInfo"></p>
+      <table>
+        <tr><td>Efectivo inicial</td><td id="cajaResumenInicial">RD$0</td></tr>
+        <tr><td>Ventas en efectivo</td><td id="cajaResumenEfectivo">RD$0</td></tr>
+        <tr><td>Ventas por transferencia</td><td id="cajaResumenTransferencia">RD$0</td></tr>
+        <tr><td><strong>Total vendido</strong></td><td id="cajaResumenTotal"><strong>RD$0</strong></td></tr>
+        <tr><td>Efectivo esperado en caja</td><td id="cajaResumenEsperado">RD$0</td></tr>
+      </table>
+      <button class="btn-secondary btn-block" id="btnCajaShowClose" style="margin-top:12px;">Cerrar caja</button>
+    </div>
+
+    <div class="card hidden" id="cajaCloseForm">
+      <h2>Cerrar caja</h2>
+      <div class="field">
+        <label>Efectivo contado (RD$)</label>
+        <input type="number" id="cajaCountedAmount" inputmode="decimal" placeholder="0">
+      </div>
+      <button class="btn-primary btn-block" id="btnCajaConfirmClose">Confirmar cierre</button>
+    </div>
+
+    <div class="card hidden" id="cajaClosedSummary">
+      <h2>Resumen del cierre</h2>
+      <table id="cajaFinalTable"></table>
+    </div>
+  </section>
+
+  <!-- ========================= HISTORIAL ========================= -->
+  <section id="screen-historial" class="hidden">
+    <div class="card">
+      <h1>Historial y resúmenes</h1>
+      <div class="row">
+        <button class="btn-secondary" data-period="dia">Hoy</button>
+        <button class="btn-secondary" data-period="semana">Semana</button>
+        <button class="btn-secondary" data-period="mes">Mes</button>
+        <button class="btn-secondary" data-period="trimestre">Trimestre</button>
+        <button class="btn-secondary" data-period="anio">Año</button>
+      </div>
+      <p class="muted" id="histRangeLabel" style="margin-top:10px;"></p>
+    </div>
+
+    <div class="card">
+      <h2>Totales</h2>
+      <table>
+        <tr><td>Total vendido</td><td id="histTotal">RD$0</td></tr>
+        <tr><td>Efectivo</td><td id="histEfectivo">RD$0</td></tr>
+        <tr><td>Transferencia</td><td id="histTransferencia">RD$0</td></tr>
+        <tr><td>Cantidad de ventas</td><td id="histCount">0</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Por producto y tamaño</h2>
+      <div class="table-wrap">
+        <table id="histByProduct">
+          <thead><tr><th>Producto</th><th>Tamaño</th><th>Cant.</th><th>Total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Cajas del período</h2>
+      <div class="table-wrap">
+        <table id="histCajas">
+          <thead><tr><th>Fecha</th><th>Abrió</th><th>Inicial</th><th>Vendido</th><th>Contado</th><th>Diferencia</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabs hidden" id="mainNav">
+  <button data-tab="vender" class="active">🧾 Vender</button>
+  <button data-tab="catalogo">📋 Catálogo</button>
+  <button data-tab="caja">💵 Caja</button>
+  <button data-tab="historial">📊 Historial</button>
+</nav>
+
+<div id="toast" class="toast hidden"></div>
+
+<script type="module">
+/* =========================================================================
+   FRESAS POP — VENTAS Y CAJA
+   Archivo único y autocontenido. Todo el catálogo es editable desde la
+   pestaña "Catálogo" dentro de la app — este código no tiene precios fijos
+   más allá de la carga inicial (semilla) de abajo.
+   ========================================================================= */
+
+/* ------------------------- 1) CONFIG: Firebase -------------------------- */
+// Pega aquí la configuración de tu proyecto Firebase "adminfresaspop"
+// (Firebase console → ⚙️ Configuración del proyecto → Tus apps → Config del SDK)
+const firebaseConfig = {
+  apiKey: "AIzaSyDr190z0obWeyDmm2UY6_5rZ_PqXUr883E",
+  authDomain: "adminfresaspop.firebaseapp.com",
+  projectId: "adminfresaspop",
+  storageBucket: "adminfresaspop.firebasestorage.app",
+  messagingSenderId: "840834985196",
+  appId: "1:840834985196:web:28f8fa890ace7ac3dc89c9"
+};
+
+/* ------------------------- 2) CONFIG: catálogo semilla ------------------
+   Esto es lo que se carga UNA sola vez con el botón "Cargar catálogo
+   inicial" en la pestaña Catálogo. Después de eso, todo se edita desde
+   ahí — este bloque ya no se vuelve a usar. Los artículos marcados con
+   needsReview:true traen una nota para que los confirmes/edites apenas
+   abras la app, porque el precio no estaba 100% claro en lo que mandaste.
+------------------------------------------------------------------------- */
+const SEED_CATALOG = [
+  // Tamaños base (Personalizada)
+  { type:'tamano', name:'12 oz', price:350 },
+  { type:'tamano', name:'9 oz', price:250 },
+  { type:'tamano', name:'Canasta Pop', price:150 },
+  // Bases
+  { type:'base', name:'Dulce de leche', price:0 },
+  { type:'base', name:'Leche condensada', price:0 },
+  { type:'base', name:'Syrup de caramelo', price:0 },
+  { type:'base', name:'Nutella', price:50 },
+  { type:'base', name:'Pistacho', price:50 },
+  { type:'base', name:'Chocolate derretido', price:50 },
+  { type:'base', name:'Sin base', price:0 },
+  // Cremas
+  { type:'crema', name:'Crema tradicional', price:0 },
+  { type:'crema', name:'Choco Crema', price:0 },
+  { type:'crema', name:'Coco Crema', price:50 },
+  // Frutas
+  { type:'fruta', name:'Fresa', price:0 },
+  { type:'fruta', name:'Mango', price:0 },
+  { type:'fruta', name:'Mixto (solo vasos, no canasta)', price:0 },
+  // Toppings gratis
+  { type:'topping', name:'Galletas de choco', price:0 },
+  { type:'topping', name:'Granola', price:0 },
+  { type:'topping', name:'Cono triturado', price:0 },
+  { type:'topping', name:'Chispas de colores', price:0 },
+  { type:'topping', name:'Sin topping', price:0 },
+  // Toppings premium
+  { type:'toppingPremium', name:'Chispas de chocolate', price:25 },
+  { type:'toppingPremium', name:'Coco rallado', price:25 },
+  { type:'toppingPremium', name:'Kataifi', price:30 },
+  // Extras 2oz
+  { type:'extra', name:'Dulce de leche 2oz', price:25 },
+  { type:'extra', name:'Leche condensada 2oz', price:25 },
+  { type:'extra', name:'Pistacho 2oz', price:100 },
+  { type:'extra', name:'Nutella 2oz', price:50 },
+  // Favoritas (combos fijos)
+  { type:'favorita', name:'La Clásica', sizePrices:[{label:'9 oz',price:250},{label:'12 oz',price:350}] },
+  { type:'favorita', name:'Choco Pop', sizePrices:[{label:'9 oz',price:300},{label:'12 oz',price:400}] },
+  { type:'favorita', name:'Oasis Exótico', sizePrices:[{label:'9 oz',price:350},{label:'12 oz',price:450}] },
+  { type:'favorita', name:'Pistacho Paradise', sizePrices:[{label:'9 oz',price:300},{label:'12 oz',price:400}] },
+  { type:'favorita', name:'Balance', sizePrices:[{label:'9 oz',price:250},{label:'12 oz',price:350}] },
+  { type:'favorita', name:'Canasta Pop', sizePrices:[{label:'Canasta Pop',price:150}] },
+  { type:'favorita', name:'Nutipop', sizePrices:[{label:'9 oz',price:300},{label:'12 oz',price:400}] },
+  // Premium
+  { type:'premium', name:'Fresas Dubái', needsReview:true,
+    note:'El flyer de Instagram dice 9oz RD$550, tu hoja de costos dice 9oz RD$500. Se cargó RD$500 — confirma y ajusta si hace falta.',
+    sizePrices:[{label:'9 oz',price:500},{label:'12 oz',price:700}] },
+  { type:'premium', name:'Pistacho Pop', needsReview:true,
+    note:'Precio de una conversación anterior, confirma que siga vigente.',
+    sizePrices:[{label:'9 oz',price:500},{label:'12 oz',price:650}] },
+  { type:'premium', name:'Chocolatosas Chocolate Blanco', needsReview:true,
+    note:'Precio de una conversación anterior, confirma que siga vigente.',
+    sizePrices:[{label:'12 oz',price:450}] },
+  { type:'premium', name:'Chocolatosas Chocolate Negro', needsReview:true,
+    note:'Precio de una conversación anterior, confirma que siga vigente.',
+    sizePrices:[{label:'12 oz',price:450}] },
+  // Otros postres
+  { type:'otro', name:'Brownie', needsReview:true,
+    note:'Precio de una conversación anterior, confirma que siga vigente.',
+    sizePrices:[{label:'Unidad',price:75}] },
+];
+
+const TYPE_LABELS = {
+  tamano:'Tamaño', base:'Base', crema:'Crema', fruta:'Fruta', topping:'Topping',
+  toppingPremium:'Topping premium', extra:'Extra 2oz', favorita:'Favorita',
+  premium:'Premium', otro:'Otro postre'
+};
+const SIMPLE_TYPES = ['tamano','base','crema','fruta','topping','toppingPremium','extra'];
+const COMBO_TYPES = ['favorita','premium','otro'];
+
+/* ------------------------------------------------------------------------ */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  updateProfile, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc,
+  query, where, orderBy, Timestamp, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const needsConfig = !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PEGA_AQUI");
+if (needsConfig) {
+  document.getElementById('screen-needconfig').classList.remove('hidden');
+} else {
+  bootApp();
+}
+
+function bootApp(){
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const state = {
+    staff: [],          // all staff docs
+    currentStaff: null, // {id, name}
+    catalog: [],         // all catalog docs
+    ticket: [],          // items in current sale ticket
+    personalizada: {},   // current selections while building a custom order
+    openSession: null,   // current open cashSessions doc {id,...}
+    tab: 'vender',
+  };
+
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  function showToast(msg){
+    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>t.classList.add('hidden'), 2200);
+  }
+  function money(n){
+    n = Number(n)||0;
+    return 'RD$' + n.toLocaleString('es-DO', {maximumFractionDigits:2});
+  }
+  function showScreen(name){
+    ['login','setup','vender','catalogo','caja','historial'].forEach(s=>{
+      const el = $('#screen-'+s);
+      if (el) el.classList.toggle('hidden', s!==name);
+    });
+  }
+
+  /* ------------------------- AUTH (PIN real, no anónimo) -------------------------
+     El PIN de 4 dígitos ES la contraseña real: cada persona tiene su propia
+     cuenta de Firebase Authentication (email inventado que nadie ve, generado
+     a partir de su PIN). Sin el PIN correcto, Firestore no entrega ni acepta
+     datos de ventas/caja/catálogo — no es solo un candado de pantalla.
+     La colección "staff" es la única de lectura pública (solo nombres, sin
+     PIN) para poder mostrar "configura tu equipo" la primera vez. --------- */
+  function pinEmail(pin){ return 'pin' + pin + '@fresaspop-ventas.app'; }
+  function pinPassword(pin){ return 'FRESA-' + pin + '-POP'; }
+
+  async function createStaff(name, pin){
+    const cred = await createUserWithEmailAndPassword(auth, pinEmail(pin), pinPassword(pin));
+    await updateProfile(cred.user, {displayName: name});
+    await setDoc(doc(db,'staff',cred.user.uid), {name, createdAt: Timestamp.now()});
+    await signOut(auth);
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    await loadStaff();
+    if (state.staff.length === 0) {
+      showScreen('setup');
+      return;
+    }
+    if (user) {
+      state.currentStaff = {id:user.uid, name: user.displayName || 'Sin nombre'};
+      await loadCatalog();
+      await loadOpenSession();
+      enterApp();
+    } else {
+      showScreen('login');
+      renderPinDots();
+    }
+  });
+
+  /* ------------------------- STAFF / SETUP / LOGIN ------------------------- */
+  async function loadStaff(){
+    // Lectura pública (solo nombres) — ver reglas de Firestore en las instrucciones.
+    const snap = await getDocs(collection(db,'staff'));
+    state.staff = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderStaffList();
+  }
+
+  $('#btnSetupCreate').addEventListener('click', async ()=>{
+    const name = $('#setupName').value.trim();
+    const pin = $('#setupPin').value.trim();
+    if (!name || !/^\d{4}$/.test(pin)) { showToast('Escribe un nombre y un PIN de 4 dígitos'); return; }
+    try {
+      await createStaff(name, pin);
+      $('#setupName').value=''; $('#setupPin').value='';
+      await loadStaff();
+      showToast(name + ' fue agregada/o');
+    } catch(e){
+      showToast(e.code==='auth/email-already-in-use' ? 'Ese PIN ya está en uso, elige otro' : ('No se pudo crear: '+e.message));
+    }
+  });
+  $('#btnSetupDone').addEventListener('click', async ()=>{
+    if (state.staff.length === 0){ showToast('Agrega al menos una persona primero'); return; }
+    showScreen('login'); renderPinDots();
+  });
+
+  let pinBuffer = '';
+  function renderPinDots(){
+    $$('#pinDots span').forEach((s,i)=> s.classList.toggle('filled', i < pinBuffer.length));
+  }
+  $('#pinPad').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if (!btn) return;
+    const k = btn.dataset.k;
+    $('#pinError').textContent='';
+    if (k === 'borrar'){ pinBuffer = pinBuffer.slice(0,-1); }
+    else if (k === 'ok'){ tryLogin(); return; }
+    else if (pinBuffer.length < 4){ pinBuffer += k; }
+    renderPinDots();
+    if (pinBuffer.length === 4) tryLogin();
+  });
+  async function tryLogin(){
+    const pin = pinBuffer;
+    pinBuffer=''; renderPinDots();
+    try {
+      await signInWithEmailAndPassword(auth, pinEmail(pin), pinPassword(pin));
+      // onAuthStateChanged se encarga del resto (carga catálogo/caja y entra a la app)
+    } catch(e){
+      $('#pinError').textContent = 'PIN incorrecto';
+    }
+  }
+  $('#btnLogout').addEventListener('click', async ()=>{
+    await signOut(auth);
+    state.currentStaff = null;
+    $('#whoBox').classList.add('hidden');
+    $('#mainNav').classList.add('hidden');
+    showScreen('login');
+  });
+
+  function enterApp(){
+    $('#whoBox').classList.remove('hidden');
+    $('#whoName').textContent = state.currentStaff.name;
+    $('#mainNav').classList.remove('hidden');
+    switchTab('vender');
+  }
+
+  /* ------------------------- CATALOG ------------------------- */
+  async function loadCatalog(){
+    const snap = await getDocs(collection(db,'catalog'));
+    state.catalog = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderCatalogScreen();
+    renderVenderScreen();
+  }
+
+  function itemsOfType(t){ return state.catalog.filter(c=>c.type===t && c.active !== false); }
+
+  $('#seedBox').innerHTML = '';
+  function renderSeedBox(){
+    const box = $('#seedBox');
+    if (state.catalog.length > 0){ box.innerHTML=''; return; }
+    box.innerHTML = `<button class="btn-primary btn-block" id="btnSeed">Cargar catálogo inicial de Fresas Pop</button>`;
+    $('#btnSeed').addEventListener('click', async ()=>{
+      const batch = writeBatch(db);
+      SEED_CATALOG.forEach(item=>{
+        const ref = doc(collection(db,'catalog'));
+        batch.set(ref, {...item, active:true, createdAt: Timestamp.now()});
+      });
+      await batch.commit();
+      showToast('Catálogo cargado');
+      await loadCatalog();
+    });
+  }
+
+  function renderCatalogScreen(){
+    renderSeedBox();
+    [...SIMPLE_TYPES, ...COMBO_TYPES].forEach(type=>{
+      const listEl = document.getElementById('list' + type[0].toUpperCase() + type.slice(1));
+      if (!listEl) return;
+      const items = state.catalog.filter(c=>c.type===type);
+      if (items.length===0){ listEl.innerHTML = '<p class="muted">Nada todavía.</p>'; return; }
+      listEl.innerHTML = items.map(it=>{
+        const priceLabel = it.sizePrices
+          ? it.sizePrices.map(sp=>`${sp.label}: ${money(sp.price)}`).join(' · ')
+          : (it.price>0 ? '+'+money(it.price) : 'Gratis');
+        const reviewBadge = it.needsReview ? `<span class="pill warn">Revisar precio</span>` : (it.active===false ? `<span class="pill muted">Inactivo</span>` : '');
+        return `<div class="catalog-item" data-id="${it.id}">
+          <div class="info">
+            <strong>${it.name}</strong> ${reviewBadge}
+            <small>${priceLabel}${it.note ? ' — '+it.note : ''}</small>
+          </div>
+          <div class="actions">
+            <button class="btn-ghost act-edit">Editar</button>
+            <button class="btn-ghost act-toggle">${it.active===false?'Activar':'Desactivar'}</button>
+            <button class="btn-ghost act-del">Eliminar</button>
+          </div>
+        </div>`;
+      }).join('');
+    });
+    attachCatalogItemHandlers();
+  }
+
+  function attachCatalogItemHandlers(){
+    $$('.catalog-item').forEach(row=>{
+      const id = row.dataset.id;
+      const item = state.catalog.find(c=>c.id===id);
+      row.querySelector('.act-toggle').addEventListener('click', async ()=>{
+        await updateDoc(doc(db,'catalog',id), {active: item.active===false});
+        await loadCatalog();
+      });
+      row.querySelector('.act-del').addEventListener('click', async ()=>{
+        if (!confirm('¿Eliminar "'+item.name+'"? Esto no borra ventas ya registradas.')) return;
+        await deleteDoc(doc(db,'catalog',id));
+        await loadCatalog();
+      });
+      row.querySelector('.act-edit').addEventListener('click', async ()=>{
+        if (item.sizePrices){
+          const raw = prompt('Tamaños y precios (uno por línea "etiqueta, precio")',
+            item.sizePrices.map(sp=>`${sp.label}, ${sp.price}`).join('\n'));
+          if (raw===null) return;
+          const sizePrices = parseSizePrices(raw);
+          const name = prompt('Nombre', item.name) ?? item.name;
+          await updateDoc(doc(db,'catalog',id), {name, sizePrices, needsReview:false, note:''});
+        } else {
+          const price = prompt('Precio / costo extra (RD$)', item.price);
+          if (price===null) return;
+          const name = prompt('Nombre', item.name) ?? item.name;
+          await updateDoc(doc(db,'catalog',id), {name, price:Number(price)||0});
+        }
+        await loadCatalog();
+      });
+    });
+  }
+
+  function parseSizePrices(raw){
+    return raw.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const [label, price] = l.split(',').map(s=>s.trim());
+      return {label, price:Number(price)||0};
+    });
+  }
+
+  $('#newType').addEventListener('change', updateNewFieldsVisibility);
+  function updateNewFieldsVisibility(){
+    const t = $('#newType').value;
+    const isCombo = COMBO_TYPES.includes(t);
+    $('#newSimplePriceField').classList.toggle('hidden', isCombo);
+    $('#newSizePricesField').classList.toggle('hidden', !isCombo);
+  }
+  updateNewFieldsVisibility();
+
+  $('#btnAddCatalog').addEventListener('click', async ()=>{
+    const type = $('#newType').value;
+    const name = $('#newName').value.trim();
+    if (!name){ showToast('Ponle un nombre'); return; }
+    let payload = {type, name, active:true, createdAt: Timestamp.now()};
+    if (COMBO_TYPES.includes(type)){
+      payload.sizePrices = parseSizePrices($('#newSizePrices').value);
+      if (payload.sizePrices.length===0){ showToast('Agrega al menos un tamaño y precio'); return; }
+    } else {
+      payload.price = Number($('#newPrice').value)||0;
+    }
+    await addDoc(collection(db,'catalog'), payload);
+    $('#newName').value=''; $('#newPrice').value=''; $('#newSizePrices').value='';
+    showToast('Agregado al catálogo');
+    await loadCatalog();
+  });
+
+  function renderStaffList(){
+    const el = $('#listStaff');
+    if (!el) return;
+    if (state.staff.length===0){ el.innerHTML = '<p class="muted">Nadie registrado.</p>'; return; }
+    el.innerHTML = state.staff.map(s=>`
+      <div class="catalog-item" data-id="${s.id}">
+        <div class="info"><strong>${s.name}</strong><small>Acceso activo</small></div>
+        <div class="actions"><button class="btn-ghost act-staff-del">Eliminar</button></div>
+      </div>`).join('');
+    $$('#listStaff .act-staff-del').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const row = btn.closest('.catalog-item');
+        const id = row.dataset.id;
+        const s = state.staff.find(x=>x.id===id);
+        if (!confirm('¿Quitarle el acceso a '+s.name+' ahora mismo?')) return;
+        await deleteDoc(doc(db,'staff',id));
+        await loadStaff();
+      });
+    });
+  }
+  $('#btnStaffAdd').addEventListener('click', async ()=>{
+    const name = $('#staffNewName').value.trim();
+    const pin = $('#staffNewPin').value.trim();
+    if (!name || !/^\d{4}$/.test(pin)){ showToast('Nombre y PIN de 4 dígitos'); return; }
+    try {
+      await createStaff(name, pin);
+      $('#staffNewName').value=''; $('#staffNewPin').value='';
+      showToast(name+' agregada/o — vuelve a entrar con tu PIN');
+      // crear una cuenta nueva cierra la sesión actual, así que volvemos al login
+      state.currentStaff = null;
+      $('#whoBox').classList.add('hidden');
+      $('#mainNav').classList.add('hidden');
+      await loadStaff();
+      showScreen('login'); renderPinDots();
+    } catch(e){
+      showToast(e.code==='auth/email-already-in-use' ? 'Ese PIN ya está en uso, elige otro' : ('No se pudo crear: '+e.message));
+    }
+  });
+
+  /* ------------------------- VENDER ------------------------- */
+  let modo = 'menu';
+  $('#tabModoMenu').addEventListener('click', ()=>{ modo='menu'; renderVenderScreen(); });
+  $('#tabModoPersonalizada').addEventListener('click', ()=>{ modo='personalizada'; renderVenderScreen(); });
+
+  let menuSelected = null; // {item, size}
+  function renderVenderScreen(){
+    $('#modoMenu').classList.toggle('hidden', modo!=='menu');
+    $('#modoPersonalizada').classList.toggle('hidden', modo!=='personalizada');
+    $('#tabModoMenu').classList.toggle('btn-primary', modo==='menu');
+    $('#tabModoPersonalizada').classList.toggle('btn-primary', modo==='personalizada');
+
+    // Del menú: favoritas + premium + otro
+    const items = state.catalog.filter(c=>COMBO_TYPES.includes(c.type) && c.active!==false);
+    $('#menuProductGrid').innerHTML = items.map(it=>`
+      <button class="pick-btn" data-id="${it.id}">${it.name}<small>${TYPE_LABELS[it.type]}</small></button>`).join('')
+      || '<p class="muted">Carga el catálogo inicial desde la pestaña Catálogo.</p>';
+    $$('#menuProductGrid .pick-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const item = state.catalog.find(c=>c.id===b.dataset.id);
+        menuSelected = {item, size:null};
+        $$('#menuProductGrid .pick-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        $('#menuSizeCard').classList.remove('hidden');
+        $('#menuSizeGrid').innerHTML = item.sizePrices.map((sp,i)=>`
+          <button class="pick-btn" data-i="${i}">${sp.label}<small>${money(sp.price)}</small></button>`).join('');
+        $$('#menuSizeGrid .pick-btn').forEach(sb=>{
+          sb.addEventListener('click', ()=>{
+            const sp = item.sizePrices[sb.dataset.i];
+            addToTicket({name:item.name, size:sp.label, price:sp.price});
+            $$('#menuSizeGrid .pick-btn').forEach(x=>x.classList.remove('selected'));
+            sb.classList.add('selected');
+          });
+        });
+      });
+    });
+
+    // Personalizada
+    renderPickGroup('pTamano','tamano');
+    renderPickGroup('pBase','base');
+    renderPickGroup('pCrema','crema');
+    renderPickGroup('pFruta','fruta');
+    renderPickGroup('pTopping','topping');
+    renderPickGroup('pToppingPremium','toppingPremium', true);
+    renderPickGroup('pExtras','extra', true);
+    updatePersonalizadaCalc();
+  }
+
+  function renderPickGroup(elId, type, multi){
+    const el = $('#'+elId);
+    const items = itemsOfType(type);
+    el.innerHTML = items.map(it=>`
+      <button class="pick-btn" data-id="${it.id}">${it.name}<small>${it.price>0?'+'+money(it.price):'Gratis'}</small></button>`).join('')
+      || '<p class="muted">Vacío — agrégalo en Catálogo.</p>';
+    $$('#'+elId+' .pick-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if (multi){
+          b.classList.toggle('selected');
+        } else {
+          el.querySelectorAll('.pick-btn').forEach(x=>x.classList.remove('selected'));
+          b.classList.add('selected');
+        }
+        updatePersonalizadaCalc();
+      });
+    });
+  }
+
+  function selectedIn(elId){
+    return $$('#'+elId+' .pick-btn.selected').map(b=>state.catalog.find(c=>c.id===b.dataset.id)).filter(Boolean);
+  }
+  function updatePersonalizadaCalc(){
+    const tamano = selectedIn('pTamano')[0];
+    const base = selectedIn('pBase')[0];
+    const crema = selectedIn('pCrema')[0];
+    const topping = selectedIn('pTopping')[0];
+    const premiums = selectedIn('pToppingPremium');
+    const extras = selectedIn('pExtras');
+    let total = 0;
+    if (tamano) total += tamano.price;
+    if (base) total += base.price;
+    if (crema) total += crema.price;
+    if (topping) total += topping.price;
+    premiums.forEach(p=>total+=p.price);
+    extras.forEach(p=>total+=p.price);
+    $('#pCalc').textContent = money(total);
+    $('#pFinalPrice').value = total;
+    state.personalizada = {tamano, base, crema, topping, premiums, extras, total};
+  }
+  $('#btnAddPersonalizada').addEventListener('click', ()=>{
+    const p = state.personalizada;
+    if (!p.tamano){ showToast('Elige al menos el tamaño'); return; }
+    const parts = [p.base?.name, p.crema?.name, p.topping?.name, ...(p.premiums||[]).map(x=>x.name), ...(p.extras||[]).map(x=>x.name)].filter(Boolean);
+    const finalPrice = Number($('#pFinalPrice').value)||0;
+    addToTicket({name:'Personalizada ('+parts.join(', ')+')', size:p.tamano.name, price:finalPrice});
+  });
+
+  function addToTicket(item){
+    state.ticket.push(item);
+    renderTicket();
+  }
+  function renderTicket(){
+    const el = $('#ticketLines');
+    if (state.ticket.length===0){
+      el.innerHTML = '<p class="muted">Aún no has agregado productos.</p>';
+      $('#checkoutCard').style.display='none';
+    } else {
+      el.innerHTML = state.ticket.map((it,i)=>`
+        <div class="ticket-line">
+          <span>${it.name} <small class="muted">(${it.size})</small></span>
+          <span>${money(it.price)}
+            <button class="btn-ghost" data-i="${i}" data-act="edit">✎</button>
+            <button class="btn-ghost" data-i="${i}" data-act="del">✕</button>
+          </span>
+        </div>`).join('');
+      $$('#ticketLines button').forEach(b=>b.addEventListener('click', ()=>{
+        const i = Number(b.dataset.i);
+        if (b.dataset.act === 'del'){
+          state.ticket.splice(i,1);
+        } else {
+          const raw = prompt('Precio final para "'+state.ticket[i].name+'"', state.ticket[i].price);
+          if (raw===null) return;
+          state.ticket[i].price = Number(raw)||0;
+        }
+        renderTicket();
+      }));
+      $('#checkoutCard').style.display='block';
+    }
+    const total = state.ticket.reduce((s,i)=>s+i.price,0);
+    $('#ticketTotal').textContent = money(total);
+  }
+
+  $('#btnRegistrarVenta').addEventListener('click', async ()=>{
+    if (state.ticket.length===0) return;
+    if (!state.openSession){ showToast('No hay caja abierta'); return; }
+    const ticketId = 'T'+Date.now();
+    const pago = $('#cxPago').value;
+    const descuento = $('#cxDescuento').checked;
+    const credito = $('#cxCredito').checked;
+    const canal = $('#cxCanal').value;
+    const cliente = $('#cxCliente').value.trim();
+    const notas = $('#cxNotas').value.trim();
+    const batch = writeBatch(db);
+    state.ticket.forEach(item=>{
+      const ref = doc(collection(db,'sales'));
+      batch.set(ref, {
+        ticketId, productName:item.name, size:item.size, price:item.price,
+        paymentMethod:pago, descuento, credito, canal, cliente, notas,
+        staffId: state.currentStaff.id, staffName: state.currentStaff.name,
+        sessionId: state.openSession.id,
+        timestamp: Timestamp.now()
+      });
+    });
+    await batch.commit();
+    showToast('Venta registrada');
+    state.ticket = [];
+    renderTicket();
+    $('#cxDescuento').checked=false; $('#cxCredito').checked=false;
+    $('#cxCliente').value=''; $('#cxNotas').value='';
+    await refreshCajaTotals();
+  });
+
+  /* ------------------------- CAJA ------------------------- */
+  async function loadOpenSession(){
+    const snap = await getDocs(query(collection(db,'cashSessions'), where('status','==','open')));
+    state.openSession = snap.empty ? null : {id:snap.docs[0].id, ...snap.docs[0].data()};
+    renderCajaScreen();
+    renderVenderGate();
+    await refreshCajaTotals();
+  }
+  function renderVenderGate(){
+    $('#ventaCajaGate').classList.toggle('hidden', !!state.openSession);
+    $('#ventaContent').classList.toggle('hidden', !state.openSession);
+  }
+  async function openCaja(amount){
+    const ref = await addDoc(collection(db,'cashSessions'), {
+      status:'open', openingAmount:amount,
+      openedBy: state.currentStaff.name, openedById: state.currentStaff.id,
+      openedAt: Timestamp.now()
+    });
+    state.openSession = {id:ref.id, status:'open', openingAmount:amount, openedBy:state.currentStaff.name, openedAt:Timestamp.now()};
+    renderCajaScreen(); renderVenderGate(); await refreshCajaTotals();
+    showToast('Caja abierta');
+  }
+  $('#btnGateOpen').addEventListener('click', ()=>{
+    const amount = Number($('#gateOpeningAmount').value)||0;
+    openCaja(amount);
+  });
+  $('#btnCajaOpen').addEventListener('click', ()=>{
+    const amount = Number($('#cajaOpeningAmount').value)||0;
+    openCaja(amount);
+  });
+
+  async function refreshCajaTotals(){
+    if (!state.openSession) return;
+    const snap = await getDocs(query(collection(db,'sales'), where('sessionId','==',state.openSession.id)));
+    let efectivo=0, transferencia=0;
+    snap.forEach(d=>{
+      const s = d.data();
+      if (s.paymentMethod==='efectivo') efectivo += s.price;
+      else transferencia += s.price;
+    });
+    const total = efectivo+transferencia;
+    const esperado = (state.openSession.openingAmount||0) + efectivo;
+    $('#cajaResumenInicial').textContent = money(state.openSession.openingAmount);
+    $('#cajaResumenEfectivo').textContent = money(efectivo);
+    $('#cajaResumenTransferencia').textContent = money(transferencia);
+    $('#cajaResumenTotal').textContent = money(total);
+    $('#cajaResumenEsperado').textContent = money(esperado);
+    state.openSession._efectivo = efectivo;
+    state.openSession._transferencia = transferencia;
+    state.openSession._esperado = esperado;
+  }
+
+  function renderCajaScreen(){
+    const open = !!state.openSession;
+    $('#cajaClosedCard').classList.toggle('hidden', open);
+    $('#cajaOpenCard').classList.toggle('hidden', !open);
+    $('#cajaCloseForm').classList.add('hidden');
+    $('#cajaClosedSummary').classList.add('hidden');
+    if (open){
+      $('#cajaOpenInfo').textContent = 'Abierta por ' + state.openSession.openedBy;
+    }
+  }
+  $('#btnCajaShowClose').addEventListener('click', ()=> $('#cajaCloseForm').classList.remove('hidden'));
+  $('#btnCajaConfirmClose').addEventListener('click', async ()=>{
+    const counted = Number($('#cajaCountedAmount').value)||0;
+    await refreshCajaTotals();
+    const s = state.openSession;
+    const difference = counted - s._esperado;
+    await updateDoc(doc(db,'cashSessions',s.id), {
+      status:'closed', closedAt: Timestamp.now(), closedBy: state.currentStaff.name,
+      salesEfectivo: s._efectivo, salesTransferencia: s._transferencia,
+      salesTotal: s._efectivo+s._transferencia, expectedCash: s._esperado,
+      cashCounted: counted, difference
+    });
+    $('#cajaFinalTable').innerHTML = `
+      <tr><td>Efectivo inicial</td><td>${money(s.openingAmount)}</td></tr>
+      <tr><td>Ventas efectivo</td><td>${money(s._efectivo)}</td></tr>
+      <tr><td>Ventas transferencia</td><td>${money(s._transferencia)}</td></tr>
+      <tr><td>Total vendido</td><td>${money(s._efectivo+s._transferencia)}</td></tr>
+      <tr><td>Efectivo esperado</td><td>${money(s._esperado)}</td></tr>
+      <tr><td>Efectivo contado</td><td>${money(counted)}</td></tr>
+      <tr><td><strong>Diferencia</strong></td><td><strong>${money(difference)}</strong></td></tr>`;
+    $('#cajaOpenCard').classList.add('hidden');
+    $('#cajaCloseForm').classList.add('hidden');
+    $('#cajaClosedSummary').classList.remove('hidden');
+    state.openSession = null;
+    renderVenderGate();
+    showToast('Caja cerrada');
+  });
+
+  /* ------------------------- HISTORIAL ------------------------- */
+  $$('#screen-historial [data-period]').forEach(btn=>{
+    btn.addEventListener('click', ()=> loadHistorial(btn.dataset.period));
+  });
+  function getRange(period){
+    const now = new Date();
+    let start;
+    if (period==='dia'){ start = new Date(now.getFullYear(),now.getMonth(),now.getDate()); }
+    else if (period==='semana'){ start = new Date(now.getTime() - 7*24*3600*1000); }
+    else if (period==='mes'){ start = new Date(now.getFullYear(), now.getMonth(), 1); }
+    else if (period==='trimestre'){ const q = Math.floor(now.getMonth()/3)*3; start = new Date(now.getFullYear(), q, 1); }
+    else { start = new Date(now.getFullYear(), 0, 1); }
+    return {start, end: now};
+  }
+  async function loadHistorial(period){
+    const {start, end} = getRange(period);
+    $('#histRangeLabel').textContent = 'Desde ' + start.toLocaleDateString('es-DO') + ' hasta ' + end.toLocaleDateString('es-DO');
+    const snap = await getDocs(query(collection(db,'sales'),
+      where('timestamp','>=', Timestamp.fromDate(start))));
+    let total=0, efectivo=0, transferencia=0, count=0;
+    const byProduct = {};
+    snap.forEach(d=>{
+      const s = d.data();
+      total += s.price; count++;
+      if (s.paymentMethod==='efectivo') efectivo += s.price; else transferencia += s.price;
+      const key = s.productName + ' | ' + s.size;
+      if (!byProduct[key]) byProduct[key] = {name:s.productName, size:s.size, qty:0, total:0};
+      byProduct[key].qty++; byProduct[key].total += s.price;
+    });
+    $('#histTotal').textContent = money(total);
+    $('#histEfectivo').textContent = money(efectivo);
+    $('#histTransferencia').textContent = money(transferencia);
+    $('#histCount').textContent = count;
+    const rows = Object.values(byProduct).sort((a,b)=>b.qty-a.qty);
+    $('#histByProduct tbody').innerHTML = rows.map(r=>
+      `<tr><td>${r.name}</td><td>${r.size}</td><td>${r.qty}</td><td>${money(r.total)}</td></tr>`).join('')
+      || '<tr><td colspan="4" class="muted">Sin ventas en este período.</td></tr>';
+
+    const sessSnap = await getDocs(query(collection(db,'cashSessions'), where('openedAt','>=', Timestamp.fromDate(start))));
+    const sessions = sessSnap.docs.map(d=>d.data()).sort((a,b)=>b.openedAt.seconds-a.openedAt.seconds);
+    $('#histCajas tbody').innerHTML = sessions.map(s=>`
+      <tr>
+        <td>${s.openedAt.toDate().toLocaleDateString('es-DO')}</td>
+        <td>${s.openedBy}</td>
+        <td>${money(s.openingAmount)}</td>
+        <td>${s.salesTotal!=null?money(s.salesTotal):'—'}</td>
+        <td>${s.cashCounted!=null?money(s.cashCounted):'—'}</td>
+        <td>${s.difference!=null?money(s.difference):'—'}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="muted">Sin cajas en este período.</td></tr>';
+  }
+
+  /* ------------------------- NAV ------------------------- */
+  function switchTab(tab){
+    state.tab = tab;
+    $$('#mainNav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    showScreen(tab);
+    if (tab==='historial') loadHistorial('dia');
+    if (tab==='vender') renderVenderScreen();
+  }
+  $('#mainNav').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if (!btn) return;
+    switchTab(btn.dataset.tab);
+  });
+}
+</script>
+</body>
+</html>
